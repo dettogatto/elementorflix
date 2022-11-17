@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 *
 * Elementor widget for Form Poster.
 */
-class MiraiflixPostSlider extends Widget_Base {
+class MiraiflixProfGrid extends Widget_Base {
 
   /**
   * Retrieve the widget name.
@@ -23,7 +23,7 @@ class MiraiflixPostSlider extends Widget_Base {
   * @return string Widget name.
   */
   public function get_name() {
-    return 'post-slider';
+    return 'prof-grid';
   }
 
   /**
@@ -34,7 +34,7 @@ class MiraiflixPostSlider extends Widget_Base {
   * @return string Widget title.
   */
   public function get_title() {
-    return 'Posts Slider';
+    return 'Prof Grid';
   }
 
   /**
@@ -176,21 +176,13 @@ class MiraiflixPostSlider extends Widget_Base {
         'default' => ''
       ]
     );
-    $this->add_control(
-      'filter_author',
-      [
-        'label' => 'Filtra per autore corrente',
-        'type' => Controls_Manager::SWITCHER,
-        'description' => 'Se selezionato mostra solo post con lo stesso autore della pagina corrente'
-      ]
-    );
 
     $this->add_control(
       'filter_search',
       [
         'label' => 'Filtra per query di ricerca',
         'type' => Controls_Manager::SWITCHER,
-        'description' => 'Se selezionato mostra solo post che corrispondono alla ricerca e ai filtri selezionati dall\'utente.<br>I filtri dell\'utente funzionano solo se il filtro corrispondente qui sopra è lasciato vuoto.'
+        'description' => 'Se selezionato mostra solo professionisti che corrispondono alla ricerca e ai filtri selezionati dall\'utente.<br>I filtri dell\'utente funzionano solo se il filtro corrispondente qui sopra è lasciato vuoto.'
       ]
     );
 
@@ -203,7 +195,7 @@ class MiraiflixPostSlider extends Widget_Base {
         'max' => '999',
         'step' => '1',
         'default' => '20',
-        'description' => 'Quanti post mostrare',
+        'description' => 'Quanti professionisti mostrare',
       ]
     );
 
@@ -214,7 +206,7 @@ class MiraiflixPostSlider extends Widget_Base {
         'label_block' => true,
         'type' => Controls_Manager::TEXT,
         'description' => 'Il testo da mostrare quando non vengono trovati risultati',
-        'default' => 'Nessun post trovato'
+        'default' => 'Nessun professionista trovato'
       ]
     );
 
@@ -254,7 +246,7 @@ class MiraiflixPostSlider extends Widget_Base {
   protected function render() {
     $settings = $this->get_settings_for_display();
 
-    $args = miraiedu_get_widget_query_args('post', $settings);
+    $args = miraiedu_get_widget_query_args('professionisti', $settings);
 
     $query = new WP_Query( $args );
 
@@ -264,10 +256,9 @@ class MiraiflixPostSlider extends Widget_Base {
 
     ?>
 
-    <div class="miraiedu-video-slider-container posts">
+    <div class="miraiedu-video-grid-container prof">
       <?php
       if ( $query->have_posts() ) {
-
         ?>
 
 
@@ -288,20 +279,58 @@ class MiraiflixPostSlider extends Widget_Base {
             // Start looping over the query results.
             while ( $query->have_posts() ) {
               $query->the_post();
+              $the_id = get_the_ID();
+
+              $professione = get_post_meta($the_id, 'professione', true);
+              $location = get_post_meta($the_id, 'posizione', true);
+              $avalabilities = "";
+              if($location){
+                $avalabilities .= '<div><i aria-hidden="true" class="fas fa-map-marker-alt green"></i>'.$location.'</div>';
+              }
+              if(get_post_meta($the_id, 'videoconsulenza', true)){
+                $avalabilities .= '<div><i aria-hidden="true" class="fas fa-video green"></i>Video</div>';
+              }
+
+              $tariffa_t_1 = get_post_meta($the_id, 'tariffa_testo_1', true);
+              $tariffa_c_1 = get_post_meta($the_id, 'tariffa_costo_1', true);
+              $tariffa_t_2 = get_post_meta($the_id, 'tariffa_testo_2', true);
+              $tariffa_c_2 = get_post_meta($the_id, 'tariffa_costo_2', true);
+
+              $tariffe = '';
+              if($tariffa_t_1){
+                $tariffe .= '<div class="rate-row"><div>'.$tariffa_t_1.'</div><div class="green">'.$tariffa_c_1.' €</div></div>';
+              }
+              if($tariffa_t_2){
+                $tariffe .= '<div class="rate-row"><div>'.$tariffa_t_2.'</div><div class="green">'.$tariffa_c_2.' €</div></div>';
+              }
 
               ?>
 
               <div class="miraiflix-slide-container">
-                <a href="<?php the_permalink(); ?>" class="miraiflix-slide" style="background-image: url(<?php the_post_thumbnail_url(); ?>)">
+                <a href="<?php the_permalink(); ?>" class="miraiflix-slide">
                   <div class="miraiflix-slide-content">
-                    <div class="miraiflix-slide-header">
-                      BLOG
+                    <div class="miraiflix-slide-header" style="background-image: url(<?php the_post_thumbnail_url(); ?>)">
+                      <div class="header-overlay-container">
+                        <div class="header-overlay"></div>
+                        <div class="header-button">
+                          <span>Vedi profilo</span>
+                        </div>
+                      </div>
                     </div>
                     <div class="miraiflix-slide-footer">
                       <div class="miraiflix-slide-footer-text">
                         <h3><?php the_title(); ?></h3>
+                        <h5><?php echo($professione); ?></h5>
+                        <div class="availabilities">
+                          <?php echo($avalabilities); ?>
+                        </div>
+                        <div class="rates">
+                          <?php echo($tariffe); ?>
+                        </div>
+                        <p>
+                          <?php the_excerpt(); ?>
+                        </p>
                       </div>
-
                     </div>
                   </div>
                 </a>

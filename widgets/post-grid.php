@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 *
 * Elementor widget for Form Poster.
 */
-class MiraiflixPostSlider extends Widget_Base {
+class MiraiflixPostGrid extends Widget_Base {
 
   /**
   * Retrieve the widget name.
@@ -23,7 +23,7 @@ class MiraiflixPostSlider extends Widget_Base {
   * @return string Widget name.
   */
   public function get_name() {
-    return 'post-slider';
+    return 'post-grid';
   }
 
   /**
@@ -34,7 +34,7 @@ class MiraiflixPostSlider extends Widget_Base {
   * @return string Widget title.
   */
   public function get_title() {
-    return 'Posts Slider';
+    return 'Posts Grid';
   }
 
   /**
@@ -264,7 +264,7 @@ class MiraiflixPostSlider extends Widget_Base {
 
     ?>
 
-    <div class="miraiedu-video-slider-container posts">
+    <div class="miraiedu-video-grid-container posts">
       <?php
       if ( $query->have_posts() ) {
 
@@ -273,13 +273,6 @@ class MiraiflixPostSlider extends Widget_Base {
 
 
         <div class="miraiflix-container">
-
-          <div class="miraiflix-navigation-left">
-            <div class="miraiflix-navigation-left-inner"></div>
-          </div>
-          <div class="miraiflix-navigation-right">
-            <div class="miraiflix-navigation-right-inner"></div>
-          </div>
 
           <div class="miraiflix-inner-container">
 

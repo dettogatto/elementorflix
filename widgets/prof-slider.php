@@ -110,6 +110,31 @@ class MiraiflixProfSlider extends Widget_Base {
     );
 
     $this->add_control(
+      'dynamic_age',
+      [
+        'label' => 'Età dinamica personalizzata',
+        'type' => Controls_Manager::SWITCHER,
+        'description' => "Attivalo per i recommended per l'utente connesso"
+      ]
+    );
+
+    $this->add_control(
+      'child_number',
+      [
+        'label' => 'Numero del figlio',
+        'type' => Controls_Manager::NUMBER,
+        'min' => '1',
+        'max' => '20',
+        'step' => '1',
+        'default' => '1',
+        'description' => "Il numero del figlio su cui basare il filtro età. Se il figlio non esiste per l'utente corrente non verrà mostrato nulla.",
+        'condition' => [
+					'dynamic_age' => 'yes',
+				],
+      ]
+    );
+
+    $this->add_control(
       'min_age',
       [
         'label' => 'Età minima',
@@ -117,7 +142,10 @@ class MiraiflixProfSlider extends Widget_Base {
         'min' => '0',
         'max' => '999',
         'step' => '0.01',
-        'default' => '0'
+        'default' => '0',
+        'condition' => [
+					'dynamic_age' => '',
+				],
       ]
     );
 
@@ -131,6 +159,9 @@ class MiraiflixProfSlider extends Widget_Base {
         'step' => '0.01',
         'default' => '99',
         'description' => 'Lascia vuoto per non filtrare. Ricorda:<br>0.01 = 1 mese<br>0.11 = 11 mesi<br>1.6 = 1 anno e mezzo<br>2 = 2 anni<br>etc.',
+        'condition' => [
+					'dynamic_age' => '',
+				],
       ]
     );
 
@@ -309,7 +340,7 @@ class MiraiflixProfSlider extends Widget_Base {
 
             }
 
-          } else {
+          } elseif(!$settings['dynamic_age']) {
             // No posts found
             echo('<p class="miraiflix-fallback-text">'.$settings['fallback'].'</p>');
           }

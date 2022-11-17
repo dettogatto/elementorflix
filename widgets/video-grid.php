@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 *
 * Elementor widget for Form Poster.
 */
-class MiraiflixPostSlider extends Widget_Base {
+class MiraiflixVideoGrid extends Widget_Base {
 
   /**
   * Retrieve the widget name.
@@ -23,7 +23,7 @@ class MiraiflixPostSlider extends Widget_Base {
   * @return string Widget name.
   */
   public function get_name() {
-    return 'post-slider';
+    return 'video-grid';
   }
 
   /**
@@ -34,7 +34,7 @@ class MiraiflixPostSlider extends Widget_Base {
   * @return string Widget title.
   */
   public function get_title() {
-    return 'Posts Slider';
+    return 'Video Grid';
   }
 
   /**
@@ -181,7 +181,7 @@ class MiraiflixPostSlider extends Widget_Base {
       [
         'label' => 'Filtra per autore corrente',
         'type' => Controls_Manager::SWITCHER,
-        'description' => 'Se selezionato mostra solo post con lo stesso autore della pagina corrente'
+        'description' => 'Se selezionato mostra solo video con lo stesso autore della pagina corrente'
       ]
     );
 
@@ -190,7 +190,7 @@ class MiraiflixPostSlider extends Widget_Base {
       [
         'label' => 'Filtra per query di ricerca',
         'type' => Controls_Manager::SWITCHER,
-        'description' => 'Se selezionato mostra solo post che corrispondono alla ricerca e ai filtri selezionati dall\'utente.<br>I filtri dell\'utente funzionano solo se il filtro corrispondente qui sopra è lasciato vuoto.'
+        'description' => 'Se selezionato mostra solo video che corrispondono alla ricerca e ai filtri selezionati dall\'utente.<br>I filtri dell\'utente funzionano solo se il filtro corrispondente qui sopra è lasciato vuoto.'
       ]
     );
 
@@ -203,7 +203,7 @@ class MiraiflixPostSlider extends Widget_Base {
         'max' => '999',
         'step' => '1',
         'default' => '20',
-        'description' => 'Quanti post mostrare',
+        'description' => 'Quanti video mostrare',
       ]
     );
 
@@ -214,7 +214,7 @@ class MiraiflixPostSlider extends Widget_Base {
         'label_block' => true,
         'type' => Controls_Manager::TEXT,
         'description' => 'Il testo da mostrare quando non vengono trovati risultati',
-        'default' => 'Nessun post trovato'
+        'default' => 'Nessun video trovato'
       ]
     );
 
@@ -254,7 +254,7 @@ class MiraiflixPostSlider extends Widget_Base {
   protected function render() {
     $settings = $this->get_settings_for_display();
 
-    $args = miraiedu_get_widget_query_args('post', $settings);
+    $args = miraiedu_get_widget_query_args('video-post', $settings);
 
     $query = new WP_Query( $args );
 
@@ -264,7 +264,7 @@ class MiraiflixPostSlider extends Widget_Base {
 
     ?>
 
-    <div class="miraiedu-video-slider-container posts">
+    <div class="miraiedu-video-grid-container">
       <?php
       if ( $query->have_posts() ) {
 
@@ -273,13 +273,6 @@ class MiraiflixPostSlider extends Widget_Base {
 
 
         <div class="miraiflix-container">
-
-          <div class="miraiflix-navigation-left">
-            <div class="miraiflix-navigation-left-inner"></div>
-          </div>
-          <div class="miraiflix-navigation-right">
-            <div class="miraiflix-navigation-right-inner"></div>
-          </div>
 
           <div class="miraiflix-inner-container">
 
@@ -295,16 +288,23 @@ class MiraiflixPostSlider extends Widget_Base {
                 <a href="<?php the_permalink(); ?>" class="miraiflix-slide" style="background-image: url(<?php the_post_thumbnail_url(); ?>)">
                   <div class="miraiflix-slide-content">
                     <div class="miraiflix-slide-header">
-                      BLOG
                     </div>
                     <div class="miraiflix-slide-footer">
                       <div class="miraiflix-slide-footer-text">
                         <h3><?php the_title(); ?></h3>
+                        <p>
+                          <?php the_excerpt(); ?>
+                        </p>
                       </div>
-
+                      <div class="miraiflix-slide-footer-icon">
+                        <i class="fas fa-play-circle"></i>
+                      </div>
                     </div>
                   </div>
                 </a>
+                <div class="miraiflix-small-caption">
+                  <?php the_title(); ?>
+                </div>
               </div>
 
               <?php

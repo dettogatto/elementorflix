@@ -52,21 +52,35 @@ add_action( 'elementor/elements/categories_registered', function($elements_manag
 
 add_action( 'elementor/widgets/widgets_registered', function(){
   require_once( __DIR__ . '/widgets/video-slider.php' );
+  require_once( __DIR__ . '/widgets/video-grid.php' );
   require_once( __DIR__ . '/widgets/post-slider.php' );
+  require_once( __DIR__ . '/widgets/post-grid.php' );
   require_once( __DIR__ . '/widgets/prof-slider.php' );
+  require_once( __DIR__ . '/widgets/prof-grid.php' );
+  require_once( __DIR__ . '/widgets/tappa-eta.php' );
   \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixVideoSlider() );
+  \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixVideoGrid() );
   \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixPostSlider() );
+  \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixPostGrid() );
   \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixProfSlider() );
+  \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixProfGrid() );
+  \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraieduTappaEta() );
 } );
 
 add_action( 'elementor_pro/init', function(){
   // Here its safe to include our action class file
   include_once( __DIR__ . '/form-actions/user-login.php' );
+  include_once( __DIR__ . '/form-actions/user-register.php' );
+  include_once( __DIR__ . '/form-actions/user-edit-child-data.php' );
 
   // // Instantiate the action class
   $miraiedu_login = new Elementor_Miraiedu_Login();
+  $miraiedu_register = new Elementor_Miraiedu_Register();
+  $miraiedu_edit_child = new Elementor_Miraiedu_Edit_Child_Data();
 
   // Register the action with form widget
   \ElementorPro\Plugin::instance()->modules_manager->get_modules( 'forms' )->add_form_action( $miraiedu_login->get_name(), $miraiedu_login );
+  \ElementorPro\Plugin::instance()->modules_manager->get_modules( 'forms' )->add_form_action( $miraiedu_register->get_name(), $miraiedu_register );
+  \ElementorPro\Plugin::instance()->modules_manager->get_modules( 'forms' )->add_form_action( $miraiedu_edit_child->get_name(), $miraiedu_edit_child );
 
 } );

@@ -1,63 +1,97 @@
 <?php
 
-function miraiedu_get_widget_query_args($post_type, $settings){
+// Remove admin bar for non admins
+add_action('after_setup_theme', function() {
+  if (!current_user_can('administrator') && !is_admin()) {
+    show_admin_bar(false);
+  }
+});
 
+function issetsetting($settings, $name) {
+  return isset($setting[$name]) && $setting[$name];
+}
+
+function miraiedu_get_widget_query_args($post_type, $settings){
+  
   $meta_query = array('relation' => 'AND');
   $tax_query = array();
   $posts_per_page = 20;
   $page = 0;
-
-  if($settings['posts_per_page']){
+  
+  if(issetsetting($settings, 'posts_per_page')){
     $posts_per_page = $settings['posts_per_page'];
   }
-
-
-  if($settings['topics']){ // Topic filter
+  
+  
+  if(issetsetting($settings, 'topics')){ // Topic filter
     $tax_query[] = array(
       'taxonomy' => 'filtri_temi',
       'field' => 'slug',
       'terms' => explode(',', $settings['topics'])
     );
-  } elseif($settings['filter_search'] && isset($_GET['temi'])){
+  } elseif(issetsetting($settings, 'filter_search') && isset($_GET['temi'])){
     $tax_query[] = array(
       'taxonomy' => 'filtri_temi',
       'field' => 'slug',
       'terms' => explode(',', $_GET['temi'])
     );
   }
+  
+  $childData = miraiedu_get_current_user_child_data();
+  if($settings['dynamic_age']){ // User-custom age filter on child age
+    $index = intval($settings['child_number']) - 1;
+    if($childData && isset($childData[$index]) && $childData[$index]['birth_date']){
+      $age = miraiedu_date_to_age($childData[$index]['birth_date']);
+      $meta_query[] = array(
+        'key' => 'age_max',
+        'compare' => '>=',
+        'value' => $age,
+        'type' => 'DECIMAL(10, 2)'
+      );
+      $meta_query[] = array(
+        'key' => 'age_min',
+        'compare' => '<=',
+        'value' => $age,
+        'type' => 'DECIMAL(10, 2)'
+      );
+    } else {
+      $post_type = 'none';
+    }
 
-  if($settings['min_age'] || $settings['min_age'] === 0){ // Min age filter
-    $meta_query[] = array(
-      'key' => 'age_max',
-      'compare' => '>=',
-      'value' => $settings['min_age'],
-      'type' => 'NUMERIC'
-    );
-  } elseif($settings['filter_search'] && isset($_GET['eta-min'])){
-    $meta_query[] = array(
-      'key' => 'age_max',
-      'compare' => '>=',
-      'value' => $_GET['eta-min'],
-      'type' => 'NUMERIC'
-    );
+  } else { // Normal widget age filter
+    if($settings['min_age'] || $settings['min_age'] === 0){ // Min age filter
+      $meta_query[] = array(
+        'key' => 'age_max',
+        'compare' => '>=',
+        'value' => $settings['min_age'],
+        'type' => 'DECIMAL(10, 2)'
+      );
+    } elseif($settings['filter_search'] && isset($_GET['eta-min'])){ // Max age filter
+      $meta_query[] = array(
+        'key' => 'age_max',
+        'compare' => '>=',
+        'value' => $_GET['eta-min'],
+        'type' => 'DECIMAL(10, 2)'
+      );
+    }
   }
-
+  
   if($settings['max_age']){ // Max age filter
     $meta_query[] = array(
       'key' => 'age_min',
       'compare' => '<=',
       'value' => $settings['max_age'],
-      'type' => 'NUMERIC'
+      'type' => 'DECIMAL(10, 2)'
     );
   } elseif($settings['filter_search'] && isset($_GET['eta-max'])){
     $meta_query[] = array(
       'key' => 'age_max',
       'compare' => '>=',
       'value' => $_GET['eta-max'],
-      'type' => 'NUMERIC'
+      'type' => 'DECIMAL(10, 2)'
     );
   }
-
+  
   $args = array(
     'post_type' => array( $post_type ),
     'orderby' => 'ASC',
@@ -66,18 +100,73 @@ function miraiedu_get_widget_query_args($post_type, $settings){
     'posts_per_page' => $posts_per_page,
     'paged' => $page
   );
-
+  
   if(isset($settings['filter_author']) && $settings['filter_author']){ // Author filter
     $args['author'] = get_the_author_meta('ID');
   }
-
-  if($settings['filter_search'] && isset($_GET['s'])){ // Search string
+  
+  if(issetsetting($settings, 'filter_search') && isset($_GET['s'])){ // Search string
     $args['s'] = $_GET['s'];
   }
-
+  
   return $args;
-
+  
 }
+
+function miraiedu_date_to_age($date){
+  $birth = new DateTime($date);
+  $now = new DateTime("now");
+  $interval = $birth->diff($now);
+  $years = floatval($interval->y);
+  $months = floatval($interval->m) / 100;
+  return ($years + $months);
+}
+
+function miraiedu_get_current_user_child_data(){
+  $currentUser = get_current_user_id();
+  if(!$currentUser){
+    return null;
+  }
+  $child_data = json_decode(get_user_meta($currentUser, 'miraiedu_child_data_json', true), true);
+  if(is_array($child_data)){
+    usort($child_data, function($a, $b){
+      $ta = strtotime($a['birth_date']);
+      $tb = strtotime($b['birth_date']);
+      return $tb-$ta;
+    });
+  }
+  return $child_data;
+}
+
+add_action('wp_ajax_get_child_data', function(){
+  $currentUser = get_current_user_id();
+  if(!$currentUser){
+    wp_die(403);
+  }
+  echo(get_user_meta($currentUser, 'miraiedu_child_data_json', true));
+  wp_die();
+});
+
+add_shortcode( "miraiedu_nome_figlio", function($atts){
+  $childN = 1;
+  if(isset($atts["n"])){
+    $childN = intval($atts["n"]);
+  }
+  if($childN > 0){
+    $childN--;
+  } else {
+    return "";
+  }
+  $childData = miraiedu_get_current_user_child_data();
+  if(isset($childData[$childN]) && isset($childData[$childN]["name"])){
+    $return = $childData[$childN]["name"];
+    if(isset($atts["before"])){
+      $return = $atts["before"].'<span>'.$return.'</span>';
+    }
+    return $return;
+  }
+  return "";
+} );
 
 add_shortcode( "miraiedu_icons_single", function($atts){
   $field = $atts["field"];
@@ -106,9 +195,9 @@ add_shortcode( "miraiedu_icons_and_coordinates", function($atts){
   $links = [];
   for($i = 1; $i < 11; $i++){
     $cont = get_field($field . $i);
-
+    
     $addr = miraiedu_build_address($i);
-
+    
     if($addr){
       $contents[] = $addr;
       $coo = str_replace(' ','', get_field($field_coo . $i));
@@ -159,65 +248,65 @@ add_shortcode( "miraiedu_professionista_contatti", function($atts){
 function miraiedu_build_icon_list($contents, $icons = [], $links = []){
   ob_start();
   ?>
-
-
-
+  
+  
+  
   <div class="elementor-element elementor-align-left elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list" data-element_type="widget" data-widget_type="icon-list.default">
-    <div class="elementor-widget-container">
-      <ul class="elementor-icon-list-items">
-
-        <?php
-
-        for($i=0; $i < count($contents); $i++){
-
-          $cont = $contents[$i];
-
-          if(!empty($cont)){
-            $icon = (isset($icons[$i]) && !empty($icons[$i])) ? $icons[$i] : "far fa-thumbs-up";
-
-            ?>
-
-            <li class="elementor-icon-list-item">
-              <?php
-              if(isset($links[$i])){
-                echo('<a ');
-                if(!empty($links[$i])){
-                  echo('href="'.$links[$i].'"');
-                }
-                echo('>');
-              }
-              ?>
-              <span class="elementor-icon-list-icon">
-                <i aria-hidden="true" class="<?php echo($icon); ?>"></i>
-              </span>
-              <span class="elementor-icon-list-text"><?php echo($cont); ?></span>
-              <?php
-              if(isset($links[$i])){echo('</a>');}
-              ?>
-
-            </li>
-
-            <?php
-
-          }
-
-
-        }
-
-        ?>
-      </ul>
-    </div>
-  </div>
-
+  <div class="elementor-widget-container">
+  <ul class="elementor-icon-list-items">
+  
   <?php
-
+  
+  for($i=0; $i < count($contents); $i++){
+    
+    $cont = $contents[$i];
+    
+    if(!empty($cont)){
+      $icon = (isset($icons[$i]) && !empty($icons[$i])) ? $icons[$i] : "far fa-thumbs-up";
+      
+      ?>
+      
+      <li class="elementor-icon-list-item">
+      <?php
+      if(isset($links[$i])){
+        echo('<a ');
+        if(!empty($links[$i])){
+          echo('href="'.$links[$i].'"');
+        }
+        echo('>');
+      }
+      ?>
+      <span class="elementor-icon-list-icon">
+      <i aria-hidden="true" class="<?php echo($icon); ?>"></i>
+      </span>
+      <span class="elementor-icon-list-text"><?php echo($cont); ?></span>
+      <?php
+      if(isset($links[$i])){echo('</a>');}
+      ?>
+      
+      </li>
+      
+      <?php
+      
+    }
+    
+    
+  }
+  
+  ?>
+  </ul>
+  </div>
+  </div>
+  
+  <?php
+  
   $ret = ob_get_clean();
   return $ret;
 }
 
 add_shortcode( "miraiedu_professionista_js", function($atts){
   $video = [];
-
+  
   for($i = 1; $i < 7; $i++){
     $group = get_field("video_". $i);
     $img = NULL;
@@ -233,29 +322,29 @@ add_shortcode( "miraiedu_professionista_js", function($atts){
       $video[] = ["img" => $img, "url" => $url];
     }
   }
-
+  
   if(empty($video)){
     ?>
-
+    
     <script>
     (function($){
       $('.miraiedu-video-slider-container').hide();
     })(jQuery);
     </script>
-
+    
     <?php
   } else {
     ?>
-
+    
     <script>
     (function($){
-
+      
       var video = <?php echo(json_encode($video)); ?>;
-
+      
       var $wrapper = $('.miraiedu-video-slider').find('.swiper-wrapper');
       var $slide = $wrapper.find('.swiper-slide').first().clone();
       $wrapper.html("");
-
+      
       for(i = 0; i < video.length; i++){
         $current = $slide.clone();
         $current.find("a").attr("data-elementor-lightbox-video", video[i]["url"]);
@@ -264,15 +353,15 @@ add_shortcode( "miraiedu_professionista_js", function($atts){
         $image.removeClass('rocket-lazyload');
         $wrapper.append($current);
       }
-
-
-
+      
+      
+      
     })(jQuery);
     </script>
-
+    
     <?php
   }
-
+  
 });
 
 function miraiedu_build_address($num){

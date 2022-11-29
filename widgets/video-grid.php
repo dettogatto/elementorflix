@@ -92,6 +92,46 @@ class MiraiflixVideoGrid extends Widget_Base {
     wp_register_style( 'miraiflix-css', plugins_url( '/assets/css/miraiflix.css', __DIR__ ) );
   }
 
+    /**
+  * Add CSS Typography control
+  */
+
+  private function add_typography_control($title, $slug, $selector, $close = true) {
+
+    $this->start_controls_section(
+      'section_'.$slug.'_style',
+      [
+        'label' => $title,
+        'tab' => Controls_Manager::TAB_STYLE,
+      ]
+    );
+
+    $this->add_control(
+			'color_'.$slug,
+			[
+				'label' => esc_html__( 'Text Color', 'elementor' ),
+        'name' => 'color_'.$slug,
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} '.$selector => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+    $this->add_group_control(
+      'typography',
+      [
+        'Label' => 'Typography',
+        'name' => 'typography_'.$slug,
+        'selector' => '{{WRAPPER}} '.$selector,
+      ]
+    );
+
+    if($close){
+      $this->end_controls_section();
+    }
+  }
+
 
   /**
   * Register the widget controls.
@@ -220,27 +260,29 @@ class MiraiflixVideoGrid extends Widget_Base {
 
     $this->end_controls_section();
 
-
-    $this->start_controls_section(
-      'section_style',
-      [
-        'label' => 'Style',
-        'tab' => Controls_Manager::TAB_STYLE,
-      ]
+    $this->add_typography_control(
+      "Title",
+      "title",
+      ".miraiflix-small-caption"
     );
 
-    $this->add_group_control(
-      'typography',
-      [
-        'Label' => 'Caption Typo',
-        'name' => 'typography_filter',
-        'selector' => '{{WRAPPER}} .miraiflix-fallback-text',
-      ]
+    $this->add_typography_control(
+      "Title Hover",
+      "title_hover",
+      ".miraiflix-slide-footer-text h3"
     );
 
-    $this->end_controls_section();
+    $this->add_typography_control(
+      "Text Hover",
+      "text",
+      ".miraiflix-slide-footer-text p"
+    );
 
-
+    $this->add_typography_control(
+      "Fallback Text",
+      "fallback",
+      ".miraiflix-fallback-text"
+    );
 
   }
 
@@ -264,7 +306,7 @@ class MiraiflixVideoGrid extends Widget_Base {
 
     ?>
 
-    <div class="miraiedu-video-grid-container">
+    <div class="miraiedu-video-slider-container grid">
       <?php
       if ( $query->have_posts() ) {
 

@@ -94,6 +94,47 @@ class MiraiflixProfGrid extends Widget_Base {
 
 
   /**
+  * Add CSS Typography control
+  */
+
+  private function add_typography_control($title, $slug, $selector, $close = true) {
+
+    $this->start_controls_section(
+      'section_'.$slug.'_style',
+      [
+        'label' => $title,
+        'tab' => Controls_Manager::TAB_STYLE,
+      ]
+    );
+
+    $this->add_control(
+			'color_'.$slug,
+			[
+				'label' => esc_html__( 'Text Color', 'elementor' ),
+        'name' => 'color_'.$slug,
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} '.$selector => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+    $this->add_group_control(
+      'typography',
+      [
+        'Label' => 'Typography',
+        'name' => 'typography_'.$slug,
+        'selector' => '{{WRAPPER}} '.$selector,
+      ]
+    );
+
+    if($close){
+      $this->end_controls_section();
+    }
+  }
+
+
+  /**
   * Register the widget controls.
   *
   * Adds different input fields to allow the user to change and customize the widget settings.
@@ -212,25 +253,30 @@ class MiraiflixProfGrid extends Widget_Base {
 
     $this->end_controls_section();
 
-
-    $this->start_controls_section(
-      'section_style',
-      [
-        'label' => 'Style',
-        'tab' => Controls_Manager::TAB_STYLE,
-      ]
+    $this->add_typography_control(
+      "Title",
+      "title",
+      ".miraiflix-slide-header h3"
     );
 
-    $this->add_group_control(
-      'typography',
-      [
-        'Label' => 'Caption Typo',
-        'name' => 'typography_filter',
-        'selector' => '{{WRAPPER}} .miraiflix-fallback-text',
-      ]
+    $this->add_typography_control(
+      "Profession",
+      "profession",
+      ".miraiflix-slide-header h4"
     );
 
-    $this->end_controls_section();
+    $this->add_typography_control(
+      "Curriculum",
+      "curriculum_hover",
+      ".miraiedu-video-slider-container.prof .miraiflix-slide-footer p"
+    );    
+
+    $this->add_typography_control(
+      "Button",
+      "button_hover",
+      ".miraiedu-video-slider-container.prof .miraiflix-footer-button"
+    );
+
 
 
 
@@ -256,7 +302,7 @@ class MiraiflixProfGrid extends Widget_Base {
 
     ?>
 
-    <div class="miraiedu-video-grid-container prof">
+    <div class="miraiedu-video-slider-container grid prof miraiedu-prof-container">
       <?php
       if ( $query->have_posts() ) {
         ?>
@@ -264,13 +310,6 @@ class MiraiflixProfGrid extends Widget_Base {
 
 
         <div class="miraiflix-container">
-
-          <div class="miraiflix-navigation-left">
-            <div class="miraiflix-navigation-left-inner"></div>
-          </div>
-          <div class="miraiflix-navigation-right">
-            <div class="miraiflix-navigation-right-inner"></div>
-          </div>
 
           <div class="miraiflix-inner-container">
 
@@ -282,54 +321,37 @@ class MiraiflixProfGrid extends Widget_Base {
               $the_id = get_the_ID();
 
               $professione = get_post_meta($the_id, 'professione', true);
-              $location = get_post_meta($the_id, 'posizione', true);
-              $avalabilities = "";
-              if($location){
-                $avalabilities .= '<div><i aria-hidden="true" class="fas fa-map-marker-alt green"></i>'.$location.'</div>';
-              }
-              if(get_post_meta($the_id, 'videoconsulenza', true)){
-                $avalabilities .= '<div><i aria-hidden="true" class="fas fa-video green"></i>Video</div>';
-              }
+              // $location = get_post_meta($the_id, 'posizione', true);
+              $professione = get_post_meta($the_id, 'professione', true);
+              $curriculum = get_post_meta($the_id, 'curriculum', true);
 
-              $tariffa_t_1 = get_post_meta($the_id, 'tariffa_testo_1', true);
-              $tariffa_c_1 = get_post_meta($the_id, 'tariffa_costo_1', true);
-              $tariffa_t_2 = get_post_meta($the_id, 'tariffa_testo_2', true);
-              $tariffa_c_2 = get_post_meta($the_id, 'tariffa_costo_2', true);
 
-              $tariffe = '';
-              if($tariffa_t_1){
-                $tariffe .= '<div class="rate-row"><div>'.$tariffa_t_1.'</div><div class="green">'.$tariffa_c_1.' €</div></div>';
-              }
-              if($tariffa_t_2){
-                $tariffe .= '<div class="rate-row"><div>'.$tariffa_t_2.'</div><div class="green">'.$tariffa_c_2.' €</div></div>';
-              }
+              // $tariffa_t_1 = get_post_meta($the_id, 'tariffa_testo_1', true);
+              // $tariffa_c_1 = get_post_meta($the_id, 'tariffa_costo_1', true);
+              // $tariffa_t_2 = get_post_meta($the_id, 'tariffa_testo_2', true);
+              // $tariffa_c_2 = get_post_meta($the_id, 'tariffa_costo_2', true);
+
+              // $tariffe = '';
+              // if($tariffa_t_1){
+              //   $tariffe .= '<div class="rate-row"><div>'.$tariffa_t_1.'</div><div class="green">'.$tariffa_c_1.' €</div></div>';
+              // }
+              // if($tariffa_t_2){
+              //   $tariffe .= '<div class="rate-row"><div>'.$tariffa_t_2.'</div><div class="green">'.$tariffa_c_2.' €</div></div>';
+              // }
 
               ?>
 
               <div class="miraiflix-slide-container">
-                <a href="<?php the_permalink(); ?>" class="miraiflix-slide">
+                <a href="<?php the_permalink(); ?>" class="miraiflix-slide" style="background-image: url(<?php the_post_thumbnail_url(); ?>)">
                   <div class="miraiflix-slide-content">
-                    <div class="miraiflix-slide-header" style="background-image: url(<?php the_post_thumbnail_url(); ?>)">
-                      <div class="header-overlay-container">
-                        <div class="header-overlay"></div>
-                        <div class="header-button">
-                          <span>Vedi profilo</span>
-                        </div>
-                      </div>
+                    <div class="miraiflix-slide-header">
+                      <h3><?php the_title(); ?></h3>
+                      <h4><?php echo($professione); ?></h4>
                     </div>
                     <div class="miraiflix-slide-footer">
-                      <div class="miraiflix-slide-footer-text">
-                        <h3><?php the_title(); ?></h3>
-                        <h5><?php echo($professione); ?></h5>
-                        <div class="availabilities">
-                          <?php echo($avalabilities); ?>
-                        </div>
-                        <div class="rates">
-                          <?php echo($tariffe); ?>
-                        </div>
-                        <p>
-                          <?php the_excerpt(); ?>
-                        </p>
+                      <div class="miraiflix-slide-footer-content">
+                        <p><?php echo($curriculum); ?></p>
+                        <div class="miraiflix-footer-button">Prenota una consulenza</div>
                       </div>
                     </div>
                   </div>

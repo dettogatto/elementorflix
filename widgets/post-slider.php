@@ -93,6 +93,47 @@ class MiraiflixPostSlider extends Widget_Base {
   }
 
 
+    /**
+  * Add CSS Typography control
+  */
+
+  private function add_typography_control($title, $slug, $selector, $close = true) {
+
+    $this->start_controls_section(
+      'section_'.$slug.'_style',
+      [
+        'label' => $title,
+        'tab' => Controls_Manager::TAB_STYLE,
+      ]
+    );
+
+    $this->add_control(
+			'color_'.$slug,
+			[
+				'label' => esc_html__( 'Text Color', 'elementor' ),
+        'name' => 'color_'.$slug,
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} '.$selector => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+    $this->add_group_control(
+      'typography',
+      [
+        'Label' => 'Typography',
+        'name' => 'typography_'.$slug,
+        'selector' => '{{WRAPPER}} '.$selector,
+      ]
+    );
+
+    if($close){
+      $this->end_controls_section();
+    }
+  }
+
+
   /**
   * Register the widget controls.
   *
@@ -221,26 +262,24 @@ class MiraiflixPostSlider extends Widget_Base {
     $this->end_controls_section();
 
 
-    $this->start_controls_section(
-      'section_style',
-      [
-        'label' => 'Style',
-        'tab' => Controls_Manager::TAB_STYLE,
-      ]
+    $this->add_typography_control(
+      "Title",
+      "title",
+      ".miraiflix-slide-footer h3"
     );
 
-    $this->add_group_control(
-      'typography',
-      [
-        'Label' => 'Caption Typo',
-        'name' => 'typography_filter',
-        'selector' => '{{WRAPPER}} .miraiflix-fallback-text',
-      ]
+    $this->add_typography_control(
+      "Label",
+      "label",
+      ".miraiedu-video-slider-container.posts .miraiflix-slide-content .miraiflix-slide-header"
     );
 
-    $this->end_controls_section();
 
-
+    $this->add_typography_control(
+      "Fallback Text",
+      "fallback",
+      ".miraiflix-fallback-text"
+    );
 
   }
 

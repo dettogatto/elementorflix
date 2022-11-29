@@ -3,7 +3,7 @@
 Plugin Name: MiraiEdu - Elementorflix
 Plugin URI: https://cosmo.cat
 Description: Shortcode per le icone professionisti
-Version: 0.0.2
+Version: 0.0.3
 Author: Nicola
 Author URI: https://cosmo.cat
 */

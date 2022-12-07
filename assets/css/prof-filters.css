@@ -1,0 +1,48 @@
+.miraiedu-filters-container {
+  display: flex;
+  gap: 16px;
+  padding: 20px 0px;
+  flex-wrap: wrap;
+}
+
+.miraiedu-filters-container .miraiedu-filter {
+  background-color: #23db8b;
+  border-radius: 100px;
+  line-height: 44px;
+  box-sizing: border-box;
+  padding: 0px 16px;
+  color: #fff;
+  max-width: 256px;
+  font-weight: 600;
+  flex: 1 0 150px;
+  position: relative;
+  cursor: pointer;
+}
+
+.miraiedu-filters-container .miraiedu-filter-button {
+  display: flex;
+  justify-content: space-between;
+  line-height: 44px;
+}
+
+.miraiedu-filters-container .miraiedu-filter-content {
+  left: 16px;
+  top: calc(100% + 8px);
+  position: absolute;
+  background-color: #23db8b;
+  border-radius: 16px;
+  box-shadow: 0px 3px 6px #00000029;
+  z-index: 10;
+  display: none;
+  font-weight: normal;
+  line-height: 1.5em;
+  padding: 30px;
+}
+
+.miraiedu-filters-container .miraiedu-filter-content ul {
+  list-style: none;
+}
+
+.miraiedu-filters-container .miraiedu-filter-content a {
+  color: #fff;
+}

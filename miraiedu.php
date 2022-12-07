@@ -58,6 +58,7 @@ add_action( 'elementor/widgets/widgets_registered', function(){
   require_once( __DIR__ . '/widgets/prof-slider.php' );
   require_once( __DIR__ . '/widgets/prof-grid.php' );
   require_once( __DIR__ . '/widgets/tappa-eta.php' );
+  require_once( __DIR__ . '/widgets/prof-filters.php' );
   \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixVideoSlider() );
   \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixVideoGrid() );
   \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixPostSlider() );
@@ -65,6 +66,7 @@ add_action( 'elementor/widgets/widgets_registered', function(){
   \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixProfSlider() );
   \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixProfGrid() );
   \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraieduTappaEta() );
+  \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new MiraiflixProfFilters() );
 } );
 
 add_action( 'elementor_pro/init', function(){

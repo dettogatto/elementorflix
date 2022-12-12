@@ -19,6 +19,11 @@
   cursor: pointer;
 }
 
+.miraiedu-filters-container .miraiedu-filter.reset-filters {
+  flex-grow: 0;
+  flex-basis: 1px;
+}
+
 .miraiedu-filters-container .miraiedu-filter-button {
   display: flex;
   justify-content: space-between;
@@ -39,8 +44,15 @@
   padding: 30px;
 }
 
+.miraiedu-filters-container .miraiedu-filter-heading {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .miraiedu-filters-container .miraiedu-filter-content ul {
   list-style: none;
+  padding: 0px;
 }
 
 .miraiedu-filters-container .miraiedu-filter-content a {

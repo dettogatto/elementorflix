@@ -38,7 +38,7 @@ class MiraiflixProfFilters extends Widget_Base
    */
   public function get_title()
   {
-    return 'Prof Filters';
+    return 'Filters';
   }
 
   /**
@@ -117,6 +117,15 @@ class MiraiflixProfFilters extends Widget_Base
       ]
     );
 
+    $this->add_group_control(
+      'typography',
+      [
+        'Label' => 'Typography',
+        'name' => 'typography_' . $slug,
+        'selector' => '{{WRAPPER}} ' . $selector,
+      ]
+    );
+
     $this->add_control(
       'color_' . $slug,
       [
@@ -126,15 +135,6 @@ class MiraiflixProfFilters extends Widget_Base
         'selectors' => [
           '{{WRAPPER}} ' . $selector => 'color: {{VALUE}};',
         ],
-      ]
-    );
-
-    $this->add_group_control(
-      'typography',
-      [
-        'Label' => 'Typography',
-        'name' => 'typography_' . $slug,
-        'selector' => '{{WRAPPER}} ' . $selector,
       ]
     );
 
@@ -184,6 +184,16 @@ class MiraiflixProfFilters extends Widget_Base
         'type' => \Elementor\Controls_Manager::REPEATER,
         'fields' => [
           [
+            'name' => 'type',
+            'label' => 'Type',
+            'type' => \Elementor\Controls_Manager::SELECT,
+            'options' => [
+              'tax' => 'Taxonomy',
+              'age' => 'Age'
+            ],
+            'default' => 'tax',
+          ],
+          [
             'name' => 'title',
             'label' => 'Title',
             'type' => \Elementor\Controls_Manager::TEXT,
@@ -196,7 +206,45 @@ class MiraiflixProfFilters extends Widget_Base
             'type' => \Elementor\Controls_Manager::TEXT,
             'placeholder' => 'taxonomy_slug',
             'default' => 'filtri_professione',
+            'condition' => [
+              'type' => 'tax',
+            ],
           ],
+          [
+            'name' => 'max_terms',
+            'label' => 'Maximum terms',
+            'type' => \Elementor\Controls_Manager::NUMBER,
+            'min' => 1,
+            'max' => 200,
+            'step' => 1,
+            'default' => 15,
+            'condition' => [
+              'type' => 'tax',
+            ],
+          ],
+          [
+            'name' => 'columns',
+            'label' => 'Columns',
+            'type' => \Elementor\Controls_Manager::NUMBER,
+            'min' => 1,
+            'max' => 10,
+            'step' => 1,
+            'default' => 1,
+            'condition' => [
+              'type' => 'tax',
+            ],
+          ],
+          [
+            'name' => 'age_data',
+            'label' => 'Options',
+            'type' => \Elementor\Controls_Manager::TEXTAREA,
+            'placeholder' => '0, 0.06 | 0-6 mesi
+0.06, 1 | 6 - 12 mesi
+1, 3 | 1 - 3 anni',
+            'condition' => [
+              'type' => 'age',
+            ],
+          ]
         ],
         'default' => [
           [
@@ -213,18 +261,157 @@ class MiraiflixProfFilters extends Widget_Base
     );
 
 
-
-
-    $this->end_controls_section();
-
-    $this->add_typography_control(
-      "Heading",
-      "filter_heading_lasdhbfkiadhbv",
-      ".miraiedu-filters-container .miraiedu-filter-button"
+    $this->add_control(
+      'content_spacing',
+      [
+        'label' => 'Spacing',
+        'type' => \Elementor\Controls_Manager::NUMBER,
+        'min' => -100,
+        'max' => 100,
+        'step' => 1,
+        'default' => 0,
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-filter .miraiedu-filter-content ul' => 'margin: -{{VALUE}}px 0px;',
+          '{{WRAPPER}} .miraiedu-filter .miraiedu-filter-content li' => 'margin: {{VALUE}}px 0px;',
+        ],
+      ]
     );
 
 
 
+
+    $this->end_controls_section();
+
+
+    $this->start_controls_section(
+      'section_DEBUG_style',
+      [
+        'label' => "DEBUG",
+        'tab' => Controls_Manager::TAB_STYLE,
+      ]
+    );
+
+    $this->add_control(
+      'show_first_element',
+      [
+        'label' => 'Show First',
+        'type' => \Elementor\Controls_Manager::SWITCHER,
+        'label_on' => 'Show',
+        'label_off' => 'No',
+        'return_value' => 'yes',
+        'default' => 'no',
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-filter:first-child .miraiedu-filter-content' => 'display: block',
+        ],
+      ]
+    );
+
+    $this->end_controls_section();
+
+
+    $this->add_typography_control(
+      "Heading",
+      "filter_heading_lasdhbfkiadhbv",
+      ".miraiedu-filters-container .miraiedu-filter-button",
+    false
+    );
+
+    $this->add_control(
+      'heading_color_active',
+      [
+        'label' => esc_html__('Text Color (Active)', 'elementor'),
+        'type' => Controls_Manager::COLOR,
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-filter.active .miraiedu-filter-button' => 'color: {{VALUE}};',
+        ],
+      ]
+    );
+
+    $this->add_control(
+      'background_color',
+      [
+        'label' => esc_html__('Background Color', 'elementor'),
+        'type' => Controls_Manager::COLOR,
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-filter' => 'background-color: {{VALUE}};',
+        ],
+      ]
+    );
+
+    $this->add_control(
+      'background_color_active',
+      [
+        'label' => esc_html__('Background Color (Active)', 'elementor'),
+        'type' => Controls_Manager::COLOR,
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-filter.active' => 'background-color: {{VALUE}};',
+        ],
+      ]
+    );
+
+    $this->end_controls_section();
+
+    $this->add_typography_control(
+      "Content",
+      "filter_content_style",
+      ".miraiedu-filters-container .miraiedu-filter-content li",
+    false
+    );
+
+    $this->add_control(
+      'color_content_active',
+      [
+        'label' => esc_html__('Text Color (Active)', 'elementor'),
+        'type' => Controls_Manager::COLOR,
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-filter .miraiedu-filter-content li.active a' => 'color: {{VALUE}};',
+        ],
+      ]
+    );
+
+    $this->add_control(
+      'background_color_content',
+      [
+        'label' => esc_html__('Background Color', 'elementor'),
+        'type' => Controls_Manager::COLOR,
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-filter .miraiedu-filter-content' => 'background-color: {{VALUE}};',
+        ],
+      ]
+    );
+
+    $this->add_control(
+      'content_v_spacing',
+      [
+        'label' => 'Vertical Spacing',
+        'type' => \Elementor\Controls_Manager::NUMBER,
+        'min' => 0,
+        'max' => 200,
+        'step' => 1,
+        'default' => 0,
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-filter .miraiedu-filter-content ul' => 'margin: -{{VALUE}}px 0px;',
+          '{{WRAPPER}} .miraiedu-filter .miraiedu-filter-content li' => 'margin: {{VALUE}}px 0px;',
+        ],
+      ]
+    );
+
+    $this->add_control(
+      'content_column_spacing',
+      [
+        'label' => 'Column Spacing',
+        'type' => \Elementor\Controls_Manager::NUMBER,
+        'min' => 0,
+        'max' => 200,
+        'step' => 1,
+        'default' => 20,
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-filter .miraiedu-filter-content ul' => 'column-gap: {{VALUE}}px;',
+        ],
+      ]
+    );
+
+    $this->end_controls_section();
 
 
 
@@ -242,7 +429,8 @@ class MiraiflixProfFilters extends Widget_Base
     $settings = $this->get_settings_for_display();
 
 ?>
-<div class="miraiedu-filters-container" data-url="<?php echo ($settings["target_link"]["url"]); ?>">
+<div class="miraiedu-filters-container <?php echo ($settings['show_first_element']); ?>"
+  data-url="<?php echo ($settings["target_link"]["url"]); ?>">
   <?php
 
     // $args = miraiedu_get_widget_query_args('professionisti', $settings);
@@ -252,20 +440,60 @@ class MiraiflixProfFilters extends Widget_Base
 
     foreach ($settings['list'] as $index => $item):
       $filter_title = $item["title"];
-      $filter_tax = $item["taxonomy"];
+      $filter_tax = "";
+      $terms = array();
 
-      $terms = get_terms(
-        array(
-          'taxonomy' => $filter_tax,
-          'hide_empty' => true,
-          'orderby' => 'count',
-          'order' => 'DESC'
-        )
-      );
+      if ($item["type"] == "age") {
+        $filter_tax = "filtri_eta";
+        foreach (explode("\n", $item["age_data"]) as $line) {
+          $line = explode("|", $line);
+          $terms[] = [
+            "slug" => str_replace(" ", "", $line[0]),
+            "name" => trim($line[1]),
+          ];
+        }
+      } else {
+        $filter_tax = $item["taxonomy"];
+        $tmp_terms = get_terms(
+          array(
+            'taxonomy' => $item["taxonomy"],
+            'hide_empty' => true,
+            'orderby' => 'count',
+            'order' => 'DESC'
+          )
+        );
+        $count = intval($item['max_terms']);
+        foreach ($tmp_terms as $tt) {
+          $terms[] = (array) $tt;
+          $count--;
+          if ($count <= 0) {
+            break;
+          }
+        }
+      }
+
+
+      $active = isset($_GET[$filter_tax]) && $_GET[$filter_tax];
+      if ($active) {
+        foreach ($terms as $i => $t) {
+          if ($t["slug"] == $_GET[$filter_tax]) {
+            $filter_title = $t["name"];
+            $terms[$i]["active"] = true;
+            break;
+          }
+        }
+      }
+
+      $ul_style = "";
+      if ($item["columns"] > 1) {
+        $c = $item["columns"];
+        $ul_style = "columns: $c; -webkit-columns: $c; -moz-columns: $c;";
+      }
+
 
   ?>
 
-  <div class="miraiedu-filter">
+  <div class="miraiedu-filter <?php echo ($active ? "active" : ""); ?> miraiedu-filter-<?php echo ($filter_tax); ?>">
     <div class="miraiedu-filter-button">
       <div class="miraiedu-filter-heading">
         <?php
@@ -275,15 +503,15 @@ class MiraiflixProfFilters extends Widget_Base
       <div class="miraiedu-filter-caret"><i class="fas fa-angle-down"></i></div>
     </div>
     <div class="miraiedu-filter-content">
-      <ul>
+      <ul style="<?php echo ($ul_style); ?>">
 
         <?php
 
       foreach ($terms as $term):
         ?>
-        <li>
-          <a href="#" data-slug="<?php echo ($term->slug); ?>" data-tax="<?php echo ($filter_tax); ?>">
-            <?php echo ($term->name); ?>
+        <li class="<?php echo ($term["active"] ? "active" : "") ?>">
+          <a href="#" data-slug="<?php echo ($term["slug"]); ?>" data-tax="<?php echo ($filter_tax); ?>">
+            <?php echo ($term["name"]); ?>
           </a>
         </li>
         <?php endforeach; ?>
@@ -292,6 +520,11 @@ class MiraiflixProfFilters extends Widget_Base
   </div>
 
   <?php endforeach; ?>
+  <?php if (true): ?>
+  <div class="miraiedu-filter reset-filters">
+    <i class="fas fa-redo"></i>
+  </div>
+  <?php endif; ?>
 </div>
 <?php
 

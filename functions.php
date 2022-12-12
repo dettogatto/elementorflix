@@ -35,7 +35,7 @@ function miraiedu_get_widget_query_args($post_type, $settings)
     $tax_query[] = array(
       'taxonomy' => 'filtri_temi',
       'field' => 'slug',
-      'terms' => explode(',', $_GET['temi'])
+      'terms' => explode(',', $_GET['filtri_temi'])
     );
   }
 
@@ -68,13 +68,16 @@ function miraiedu_get_widget_query_args($post_type, $settings)
         'value' => $settings['min_age'],
         'type' => 'DECIMAL(10, 2)'
       );
-    } elseif ($settings['filter_search'] && isset($_GET['eta-min'])) { // Max age filter
-      $meta_query[] = array(
-        'key' => 'age_max',
-        'compare' => '>=',
-        'value' => $_GET['eta-min'],
-        'type' => 'DECIMAL(10, 2)'
-      );
+    } elseif ($settings['filter_search'] && isset($_GET['filtri_eta'])) { // Max age filter
+      $min_age = explode(",", $_GET['filtri_eta'])[0];
+      if ($min_age) {
+        $meta_query[] = array(
+          'key' => 'age_max',
+          'compare' => '>=',
+          'value' => $min_age,
+          'type' => 'DECIMAL(10, 2)'
+        );
+      }
     }
   }
 
@@ -85,11 +88,13 @@ function miraiedu_get_widget_query_args($post_type, $settings)
       'value' => $settings['max_age'],
       'type' => 'DECIMAL(10, 2)'
     );
-  } elseif ($settings['filter_search'] && isset($_GET['eta-max'])) {
+  } elseif ($settings['filter_search'] && isset($_GET['filtri_eta'])) {
+    $tmp = explode(",", $_GET['filtri_eta']);
+    $max_age = isset($tmp[1]) ? $tmp[1] : 99;
     $meta_query[] = array(
-      'key' => 'age_max',
-      'compare' => '>=',
-      'value' => $_GET['eta-max'],
+      'key' => 'age_min',
+      'compare' => '<=',
+      'value' => $max_age,
       'type' => 'DECIMAL(10, 2)'
     );
   }
@@ -427,3 +432,35 @@ function miraiedu_titleize($string)
   }, $string);
   return $string;
 }
+
+/* Make Wp Seach engine search in meta tags as well */
+add_filter('posts_join', function ($join) {
+  global $wpdb;
+  if (is_search()) {
+    $join .= ' LEFT JOIN ' . $wpdb->postmeta . ' ON ' . $wpdb->posts . '.ID = ' . $wpdb->postmeta . '.post_id ';
+  }
+  return $join;
+});
+
+add_filter('posts_where', function ($where) {
+  global $pagenow, $wpdb;
+  if (is_search()) {
+    $where = preg_replace(
+      "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
+      "(" . $wpdb->posts . ".post_title LIKE $1) OR (" . $wpdb->postmeta . ".meta_value LIKE $1)",
+      $where
+    );
+  }
+  return $where;
+});
+
+add_filter(
+  'posts_distinct',
+  function ($where) {
+    global $wpdb;
+    if (is_search()) {
+      return "DISTINCT";
+    }
+    return $where;
+  }
+);

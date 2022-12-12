@@ -2,10 +2,13 @@
   $(function () {
     // Handle hide/show sub-menus
     $(".miraiedu-filter-button").click(function () {
-      var $mycontent = $(".miraiedu-filter-content", $(this).parent());
+      var $parent = $(this).parent();
+      var $mycontent = $(".miraiedu-filter-content", $parent);
       var wasVisible = $mycontent.is(":visible");
       $(".miraiedu-filter .miraiedu-filter-content").fadeOut("fast");
+      $(".miraiedu-filter").removeClass("open");
       if (!wasVisible) {
+        $parent.addClass("open");
         $(".miraiedu-filter-content", $(this).parent()).fadeIn("fast");
       }
     });
@@ -13,8 +16,16 @@
     // Hide sub-menus when page is clicked
     $("html").click(function (e) {
       if ($(e.target).parents(".miraiedu-filters-container").length == 0) {
+        $(".miraiedu-filter").removeClass("open");
         $(".miraiedu-filter .miraiedu-filter-content").fadeOut("fast");
       }
+    });
+
+    // Reset button
+    $(".miraiedu-filter.reset-filters").click(function () {
+      var url = new URL(window.location.href);
+      url.search = "";
+      window.location = url.href;
     });
 
     // Change links in buttons
@@ -25,7 +36,13 @@
       );
       var url = new URL(window.location.href);
       const urlParams = url.searchParams;
-      urlParams.set($(this).attr("data-tax"), $(this).attr("data-slug"));
+      const tax = $(this).attr("data-tax");
+      const slug = $(this).attr("data-slug");
+      if (urlParams.get(tax) === slug) {
+        urlParams.delete(tax);
+      } else {
+        urlParams.set(tax, slug);
+      }
       baseUrl.search = urlParams.toString();
       return baseUrl.href;
     });

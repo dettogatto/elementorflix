@@ -1,6 +1,6 @@
 <?php
 
-class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Action_Base
+class Elementor_Miraiedu_Reset_Psw_1 extends \ElementorPro\Modules\Forms\Classes\Action_Base
 {
   /**
    * Get Name
@@ -12,7 +12,7 @@ class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Actio
    */
   public function get_name()
   {
-    return 'miraiedu_login';
+    return 'miraiedu_reset_password_1';
   }
 
   /**
@@ -25,7 +25,7 @@ class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Actio
    */
   public function get_label()
   {
-    return 'User Login';
+    return 'User Reset Password 1';
   }
 
   /**
@@ -39,21 +39,23 @@ class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Actio
    */
   public function run($record, $ajax_handler)
   {
+
     $settings = $record->get('form_settings');
     $emailField = $settings[$this->get_name() . "_email"];
-    $passField = $settings[$this->get_name() . "_password"];
-    $rememberField = $settings[$this->get_name() . "_remember"];
 
     // Get submitted Form data
     $rawFields = (array) $record->get('fields');
-    $creds = array();
-    $creds['user_login'] = $rawFields[$emailField]["value"];
-    $creds['user_password'] = $rawFields[$passField]["value"];
-    $creds['remember'] = ($rawFields[$rememberField]["value"] !== "");
+    $user_login = $rawFields[$emailField]["value"];
 
-    $login_user = wp_signon($creds, is_ssl());
+    $user = get_user_by('login', $user_login);
 
-    if (!is_wp_error($login_user)) {
+
+    if (!is_wp_error($user) && $user && !$user->is_admin()) {
+      $tmp_code = wp_generate_password(16, false, false);
+      // Save in meta data
+      update_user_meta($user->ID, 'miraiedu_temp_code', $tmp_code);
+      // Send to AC
+      miraiedu_ac_set_user_tmp_code($user->ID, $tmp_code);
       $redirect_to = $settings[$this->get_name() . "_url_success"];
       $redirect_to = $record->replace_setting_shortcodes($redirect_to, true);
       if (!empty($redirect_to)) {
@@ -107,27 +109,6 @@ class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Actio
         'description' => "The form field ID containing the email of customer",
       ],
     );
-
-    $widget->add_control(
-      $this->get_name() . "_password",
-      [
-        'label' => "FIELD: Password",
-        'type' => \Elementor\Controls_Manager::TEXT,
-        'separator' => 'none',
-        'description' => "The form field ID containing the password of customer",
-      ],
-    );
-
-    $widget->add_control(
-      $this->get_name() . "_remember",
-      [
-        'label' => "FIELD: Remember",
-        'type' => \Elementor\Controls_Manager::TEXT,
-        'separator' => 'none',
-        'description' => "The form field ID containing the remember-me checkbox",
-      ],
-    );
-
 
 
 

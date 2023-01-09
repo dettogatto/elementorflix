@@ -97,9 +97,6 @@ class MiraiflixVideoSlider extends Widget_Base
   public function __construct($data = [], $args = null)
   {
     parent::__construct($data, $args);
-
-    wp_register_script('miraiflix-js', plugins_url('/assets/js/miraiflix.js', __DIR__), array('jquery'));
-    wp_register_style('miraiflix-css', plugins_url('/assets/css/miraiflix.css', __DIR__));
   }
 
   /**
@@ -319,14 +316,9 @@ class MiraiflixVideoSlider extends Widget_Base
 
 ?>
 
+<?php if ($query->have_posts()): ?>
+
 <div class="miraiedu-video-slider-container">
-  <?php
-    if ($query->have_posts()) {
-
-  ?>
-
-
-
   <div class="miraiflix-container">
 
     <div class="miraiflix-navigation-left">
@@ -339,13 +331,10 @@ class MiraiflixVideoSlider extends Widget_Base
     <div class="miraiflix-inner-container">
 
       <?php
-
       // Start looping over the query results.
-      while ($query->have_posts()) {
+      while ($query->have_posts()):
         $query->the_post();
-
       ?>
-
       <div class="miraiflix-slide-container">
         <a href="<?php the_permalink(); ?>" class="miraiflix-slide"
           style="background-image: url(<?php the_post_thumbnail_url(); ?>)">
@@ -371,21 +360,22 @@ class MiraiflixVideoSlider extends Widget_Base
           <?php the_title(); ?>
         </div>
       </div>
-
-      <?php
-
-      }
-      echo ('</div>');
-
-    } elseif (!$settings['dynamic_age']) {
-      // No posts found
-      echo ('<p class="miraiflix-fallback-text">' . $settings['fallback'] . '</p>');
-    }
-
-      ?>
+      <?php endwhile; ?>
     </div>
+  </div>
+</div>
 
-    <?php
-  }
+<?php elseif ($settings["fallback"]): ?>
 
-}
+<div class="miraiedu-video-slider-container">
+  <p class="miraiflix-fallback-text">
+    <?php echo ($settings['fallback']); ?>
+  </p>
+</div>
+
+<?php endif; ?>
+
+
+<?php
+  } // end function
+} // end class

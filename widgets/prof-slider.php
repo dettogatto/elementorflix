@@ -6,101 +6,108 @@ use ElementorPro\Modules\QueryControl\Module as Module_Query;
 use ElementorPro\Modules\QueryControl\Controls\Group_Control_Related;
 
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if (!defined('ABSPATH'))
+  exit; // Exit if accessed directly
 
 /**
-* Elementor Form Poster
-*
-* Elementor widget for Form Poster.
-*/
-class MiraiflixProfSlider extends Widget_Base {
+ * Elementor Form Poster
+ *
+ * Elementor widget for Form Poster.
+ */
+class MiraiflixProfSlider extends Widget_Base
+{
 
   /**
-  * Retrieve the widget name.
-  *
-  * @access public
-  *
-  * @return string Widget name.
-  */
-  public function get_name() {
+   * Retrieve the widget name.
+   *
+   * @access public
+   *
+   * @return string Widget name.
+   */
+  public function get_name()
+  {
     return 'prof-slider';
   }
 
   /**
-  * Retrieve the widget title.
-  *
-  * @access public
-  *
-  * @return string Widget title.
-  */
-  public function get_title() {
+   * Retrieve the widget title.
+   *
+   * @access public
+   *
+   * @return string Widget title.
+   */
+  public function get_title()
+  {
     return 'Prof Slider';
   }
 
   /**
-  * Retrieve the widget icon.
-  *
-  * @access public
-  *
-  * @return string Widget icon.
-  */
-  public function get_icon() {
+   * Retrieve the widget icon.
+   *
+   * @access public
+   *
+   * @return string Widget icon.
+   */
+  public function get_icon()
+  {
     return 'eicon-code';
   }
 
   /**
-  * Retrieve the list of categories the widget belongs to.
-  *
-  * Used to determine where to display the widget in the editor.
-  *
-  * Note that currently Elementor supports only one category.
-  * When multiple categories passed, Elementor uses the first one.
-  *
-  * @access public
-  *
-  * @return array Widget categories.
-  */
-  public function get_categories() {
-    return [ 'miraiedu' ];
+   * Retrieve the list of categories the widget belongs to.
+   *
+   * Used to determine where to display the widget in the editor.
+   *
+   * Note that currently Elementor supports only one category.
+   * When multiple categories passed, Elementor uses the first one.
+   *
+   * @access public
+   *
+   * @return array Widget categories.
+   */
+  public function get_categories()
+  {
+    return ['miraiedu'];
   }
 
   /**
-  * Retrieve the list of scripts the widget depended on.
-  *
-  * Used to set scripts dependencies required to run the widget.
-  *
-  * @access public
-  *
-  * @return array Widget scripts dependencies.
-  */
-  public function get_script_depends() {
-    return [ 'miraiflix-js' ];
+   * Retrieve the list of scripts the widget depended on.
+   *
+   * Used to set scripts dependencies required to run the widget.
+   *
+   * @access public
+   *
+   * @return array Widget scripts dependencies.
+   */
+  public function get_script_depends()
+  {
+    return ['miraiflix-js'];
   }
 
-  public function get_style_depends() {
-    return [ 'miraiflix-css' ];
+  public function get_style_depends()
+  {
+    return ['miraiflix-css'];
   }
 
   /**
-  * Constructor
-  */
+   * Constructor
+   */
 
-  public function __construct($data = [], $args = null) {
+  public function __construct($data = [], $args = null)
+  {
     parent::__construct($data, $args);
-
-    wp_register_script( 'miraiflix-js', plugins_url( '/assets/js/miraiflix.js', __DIR__ ), array( 'jquery' ) );
-    wp_register_style( 'miraiflix-css', plugins_url( '/assets/css/miraiflix.css', __DIR__ ) );
   }
 
 
   /**
-  * Add CSS Typography control
-  */
+   * Add CSS Typography control
+   */
 
-  private function add_typography_control($title, $slug, $selector, $close = true) {
+  private function add_typography_control($title, $slug, $selector, $close = true)
+  {
 
     $this->start_controls_section(
-      'section_'.$slug.'_style',
+      'section_' . $slug . '_style',
       [
         'label' => $title,
         'tab' => Controls_Manager::TAB_STYLE,
@@ -108,44 +115,45 @@ class MiraiflixProfSlider extends Widget_Base {
     );
 
     $this->add_control(
-			'color_'.$slug,
-			[
-				'label' => esc_html__( 'Text Color', 'elementor' ),
-        'name' => 'color_'.$slug,
-				'type' => Controls_Manager::COLOR,
-				'selectors' => [
-					'{{WRAPPER}} '.$selector => 'color: {{VALUE}};',
-				],
-			]
-		);
+      'color_' . $slug,
+      [
+        'label' => esc_html__('Text Color', 'elementor'),
+        'name' => 'color_' . $slug,
+        'type' => Controls_Manager::COLOR,
+        'selectors' => [
+          '{{WRAPPER}} ' . $selector => 'color: {{VALUE}};',
+        ],
+      ]
+    );
 
     $this->add_group_control(
       'typography',
       [
         'Label' => 'Typography',
-        'name' => 'typography_'.$slug,
-        'selector' => '{{WRAPPER}} '.$selector,
+        'name' => 'typography_' . $slug,
+        'selector' => '{{WRAPPER}} ' . $selector,
       ]
     );
 
-    if($close){
+    if ($close) {
       $this->end_controls_section();
     }
   }
 
 
   /**
-  * Register the widget controls.
-  *
-  * Adds different input fields to allow the user to change and customize the widget settings.
-  *
-  * @access protected
-  */
-  protected function register_controls() {
+   * Register the widget controls.
+   *
+   * Adds different input fields to allow the user to change and customize the widget settings.
+   *
+   * @access protected
+   */
+  protected function register_controls()
+  {
     $this->start_controls_section(
       'section_query',
       [
-        'label' => esc_html__( 'Filters', 'elementor-pro' ),
+        'label' => esc_html__('Filters', 'elementor-pro'),
         'tab' => Controls_Manager::TAB_CONTENT,
       ]
     );
@@ -170,8 +178,8 @@ class MiraiflixProfSlider extends Widget_Base {
         'default' => '1',
         'description' => "Il numero del figlio su cui basare il filtro età. Se il figlio non esiste per l'utente corrente non verrà mostrato nulla.",
         'condition' => [
-					'dynamic_age' => 'yes',
-				],
+          'dynamic_age' => 'yes',
+        ],
       ]
     );
 
@@ -185,8 +193,8 @@ class MiraiflixProfSlider extends Widget_Base {
         'step' => '0.01',
         'default' => '0',
         'condition' => [
-					'dynamic_age' => '',
-				],
+          'dynamic_age' => '',
+        ],
       ]
     );
 
@@ -201,8 +209,8 @@ class MiraiflixProfSlider extends Widget_Base {
         'default' => '99',
         'description' => 'Lascia vuoto per non filtrare. Ricorda:<br>0.01 = 1 mese<br>0.11 = 11 mesi<br>1.6 = 1 anno e mezzo<br>2 = 2 anni<br>etc.',
         'condition' => [
-					'dynamic_age' => '',
-				],
+          'dynamic_age' => '',
+        ],
       ]
     );
 
@@ -253,6 +261,25 @@ class MiraiflixProfSlider extends Widget_Base {
 
     $this->end_controls_section();
 
+    $this->start_controls_section(
+      'section_coordinates_display',
+      [
+        'label' => esc_html__('Coordinates', 'elementor-pro'),
+        'tab' => Controls_Manager::TAB_CONTENT,
+      ]
+    );
+
+    $this->add_control(
+      'show_coordinates',
+      [
+        'label' => 'Mostra posizione',
+        'type' => Controls_Manager::SWITCHER,
+        'description' => "Attivalo per mostrare le due posizioni del professionista nella scheda e interagire con la mappa"
+      ]
+    );
+
+    $this->end_controls_section();
+
     $this->add_typography_control(
       "Title",
       "title",
@@ -269,13 +296,51 @@ class MiraiflixProfSlider extends Widget_Base {
       "Curriculum",
       "curriculum_hover",
       ".miraiedu-video-slider-container.prof .miraiflix-slide-footer p"
-    );    
+    );
+
+    $this->add_typography_control(
+      "Coordinate",
+      "coordinate",
+      ".miraiedu-video-slider-container.prof .miraiflix-prof-coordinates",
+    false
+    );
+
+    $this->add_control(
+      'color_coordinate_hover',
+      [
+        'label' => esc_html__('Text Color Hover', 'elementor'),
+        'name' => 'color_coordinate_hover',
+        'type' => Controls_Manager::COLOR,
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-video-slider-container.prof .miraiedu-prof-coo:hover ' => 'color: {{VALUE}};',
+        ],
+      ]
+    );
+
+    $this->add_control(
+      'coordinate_margin_bottom',
+      [
+        'label' => 'Bottom margin',
+        'type' => Controls_Manager::NUMBER,
+        'min' => '0',
+        'max' => '100',
+        'step' => '1',
+        'default' => '0',
+        'selectors' => [
+          '{{WRAPPER}} .miraiedu-video-slider-container.prof .miraiflix-prof-coordinates' => 'margin-bottom: {{VALUE}}px;',
+        ],
+      ]
+    );
+
+    $this->end_controls_section();
+
 
     $this->add_typography_control(
       "Button",
       "button_hover",
-      ".miraiedu-video-slider-container.prof .miraiflix-footer-button"
+      ".miraiedu-video-slider-container.prof .miraiflix-footer-button",
     );
+
 
 
 
@@ -283,102 +348,103 @@ class MiraiflixProfSlider extends Widget_Base {
   }
 
   /**
-  * Render the widget output on the frontend.
-  *
-  * Written in PHP and used to generate the final HTML.
-  *
-  * @access protected
-  */
-  protected function render() {
+   * Render the widget output on the frontend.
+   *
+   * Written in PHP and used to generate the final HTML.
+   *
+   * @access protected
+   */
+  protected function render()
+  {
     $settings = $this->get_settings_for_display();
 
     $args = miraiedu_get_widget_query_args('professionisti', $settings);
 
-    $query = new WP_Query( $args );
+    $query = new WP_Query($args);
 
     // echo('<pre>');
     // var_dump($args);
     // echo('</pre>');
 
-    ?>
+?>
+<?php if ($query->have_posts()): ?>
+<div class="miraiedu-video-slider-container prof miraiedu-prof-container">
+  <div class="miraiflix-container">
 
-    <div class="miraiedu-video-slider-container prof miraiedu-prof-container">
+    <div class="miraiflix-navigation-left">
+      <div class="miraiflix-navigation-left-inner"></div>
+    </div>
+    <div class="miraiflix-navigation-right">
+      <div class="miraiflix-navigation-right-inner"></div>
+    </div>
+
+    <div class="miraiflix-inner-container">
+
       <?php
-      if ( $query->have_posts() ) {
-        ?>
 
+      // Start looping over the query results.
+      while ($query->have_posts()):
+        $query->the_post();
+        $the_id = get_the_ID();
 
+        $professione = get_post_meta($the_id, 'professione', true);
+        // $location = get_post_meta($the_id, 'posizione', true);
+        $professione = get_post_meta($the_id, 'professione', true);
+        $curriculum = get_post_meta($the_id, 'curriculum', true);
+      ?>
 
-        <div class="miraiflix-container">
-
-          <div class="miraiflix-navigation-left">
-            <div class="miraiflix-navigation-left-inner"></div>
-          </div>
-          <div class="miraiflix-navigation-right">
-            <div class="miraiflix-navigation-right-inner"></div>
-          </div>
-
-          <div class="miraiflix-inner-container">
-
-            <?php
-
-            // Start looping over the query results.
-            while ( $query->have_posts() ) {
-              $query->the_post();
-              $the_id = get_the_ID();
-
-              $professione = get_post_meta($the_id, 'professione', true);
-              // $location = get_post_meta($the_id, 'posizione', true);
-              $professione = get_post_meta($the_id, 'professione', true);
-              $curriculum = get_post_meta($the_id, 'curriculum', true);
-
-
-              // $tariffa_t_1 = get_post_meta($the_id, 'tariffa_testo_1', true);
-              // $tariffa_c_1 = get_post_meta($the_id, 'tariffa_costo_1', true);
-              // $tariffa_t_2 = get_post_meta($the_id, 'tariffa_testo_2', true);
-              // $tariffa_c_2 = get_post_meta($the_id, 'tariffa_costo_2', true);
-
-              // $tariffe = '';
-              // if($tariffa_t_1){
-              //   $tariffe .= '<div class="rate-row"><div>'.$tariffa_t_1.'</div><div class="green">'.$tariffa_c_1.' €</div></div>';
-              // }
-              // if($tariffa_t_2){
-              //   $tariffe .= '<div class="rate-row"><div>'.$tariffa_t_2.'</div><div class="green">'.$tariffa_c_2.' €</div></div>';
-              // }
-
-              ?>
-
-              <div class="miraiflix-slide-container">
-                <a href="<?php the_permalink(); ?>" class="miraiflix-slide" style="background-image: url(<?php the_post_thumbnail_url(); ?>)">
-                  <div class="miraiflix-slide-content">
-                    <div class="miraiflix-slide-header">
-                      <h3><?php the_title(); ?></h3>
-                      <h4><?php echo($professione); ?></h4>
-                    </div>
-                    <div class="miraiflix-slide-footer">
-                      <div class="miraiflix-slide-footer-content">
-                        <p><?php echo($curriculum); ?></p>
-                        <div class="miraiflix-footer-button">Prenota una consulenza</div>
-                      </div>
-                    </div>
+      <div class="miraiflix-slide-container">
+        <a href="<?php the_permalink(); ?>" class="miraiflix-slide"
+          style="background-image: url(<?php the_post_thumbnail_url(); ?>)">
+          <div class="miraiflix-slide-content">
+            <div class="miraiflix-slide-header">
+              <h3>
+                <?php the_title(); ?>
+              </h3>
+              <h4>
+                <?php echo ($professione); ?>
+              </h4>
+            </div>
+            <div class="miraiflix-slide-footer">
+              <div class="miraiflix-slide-footer-content">
+                <?php if ($settings['show_coordinates']): ?>
+                <div class="miraiflix-prof-coordinates">
+                  <?php for ($i = 1; $i < 3; $i++): ?>
+                  <?php if ($coo = get_field('coordinate_' . $i)): ?>
+                  <div class="miraiedu-prof-coo" data-coo="<?php echo ($coo); ?>"
+                    data-prov="<?php echo (get_field('provincia_mappa_' . $i)); ?>">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <?php echo (get_field('citta_mappa_' . $i)); ?>
                   </div>
-                </a>
+                  <?php endif; ?>
+                  <?php endfor; ?>
+                </div>
+                <?php endif; ?>
+                <p>
+                  <?php echo ($curriculum); ?>
+                </p>
+                <div class="miraiflix-footer-button">Prenota una consulenza</div>
               </div>
-
-              <?php
-
-            }
-
-          } elseif(!$settings['dynamic_age']) {
-            // No posts found
-            echo('<p class="miraiflix-fallback-text">'.$settings['fallback'].'</p>');
-          }
-
-          ?>
-        </div>
+            </div>
+          </div>
+        </a>
       </div>
+      <?php endwhile; ?>
+    </div>
+  </div>
+</div>
 
-      <?php
-    }
+<?php elseif ($settings["fallback"]): ?>
 
-  }
+<div class="miraiedu-video-slider-container">
+  <p class="miraiflix-fallback-text">
+    <?php echo ($settings['fallback']); ?>
+  </p>
+</div>
+
+<?php endif; ?>
+
+
+<?php
+  } // end function
+} // end class

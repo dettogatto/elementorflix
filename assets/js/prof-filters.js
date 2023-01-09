@@ -23,7 +23,18 @@
 
     // Reset button
     $(".miraiedu-filter.reset-filters").click(function () {
-      var url = new URL(window.location.href);
+      var resetUrl = $(this)
+        .closest(".miraiedu-filters-container")
+        .attr("data-reset-url");
+      var url;
+      if (resetUrl) {
+        url = new URL(
+          $(this).closest(".miraiedu-filters-container").attr("data-reset-url"),
+          window.location
+        );
+      } else {
+        url = new URL(window.location.href);
+      }
       url.search = "";
       window.location = url.href;
     });

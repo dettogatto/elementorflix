@@ -1,77 +1,83 @@
 <?php
 
-class Elementor_Miraiedu_Edit_Child_Data extends \ElementorPro\Modules\Forms\Classes\Action_Base {
+class Elementor_Miraiedu_Edit_Child_Data extends \ElementorPro\Modules\Forms\Classes\Action_Base
+{
   /**
-  * Get Name
-  *
-  * Return the action name
-  *
-  * @access public
-  * @return string
-  */
-  public function get_name() {
+   * Get Name
+   *
+   * Return the action name
+   *
+   * @access public
+   * @return string
+   */
+  public function get_name()
+  {
     return 'miraiedu_edit__child_data';
   }
-  
+
   /**
-  * Get Label
-  *
-  * Returns the action label
-  *
-  * @access public
-  * @return string
-  */
-  public function get_label() {
+   * Get Label
+   *
+   * Returns the action label
+   *
+   * @access public
+   * @return string
+   */
+  public function get_label()
+  {
     return 'User Edit Child Data';
   }
-  
+
   /**
-  * Run
-  *
-  * Runs the action after submit
-  *
-  * @access public
-  * @param \ElementorPro\Modules\Forms\Classes\Form_Record $record
-  * @param \ElementorPro\Modules\Forms\Classes\Ajax_Handler $ajax_handler
-  */
-  public function run( $record, $ajax_handler ) {
-    
-    $settings = $record->get( 'form_settings' );
+   * Run
+   *
+   * Runs the action after submit
+   *
+   * @access public
+   * @param \ElementorPro\Modules\Forms\Classes\Form_Record $record
+   * @param \ElementorPro\Modules\Forms\Classes\Ajax_Handler $ajax_handler
+   */
+  public function run($record, $ajax_handler)
+  {
+
+    $settings = $record->get('form_settings');
     $childDataField = $settings[$this->get_name() . "_child_data_json"];
-    
+
     // Get submitted Form data
-    $rawFields = (array) $record->get( 'fields' );
+    $rawFields = (array) $record->get('fields');
     $currentUser = get_current_user_id();
 
-    if($currentUser){
+    if ($currentUser) {
       update_user_meta(
         $currentUser,
         'miraiedu_child_data_json',
-        json_encode( json_decode( $rawFields[$childDataField]["value"] ), JSON_PRETTY_PRINT )
+        json_encode(json_decode($rawFields[$childDataField]["value"]), JSON_PRETTY_PRINT)
       );
-      $redirect_to = $settings[$this->get_name() . "_url_success" ];
-      $redirect_to = $record->replace_setting_shortcodes( $redirect_to, true );
-      if ( ! empty( $redirect_to ) ) {
-        $ajax_handler->add_response_data( 'redirect_url', $redirect_to );
+      $redirect_to = $settings[$this->get_name() . "_url_success"];
+      $redirect_to = $record->replace_setting_shortcodes($redirect_to, true);
+      if (!empty($redirect_to)) {
+        $ajax_handler->add_response_data('redirect_url', $redirect_to);
       }
       return;
     }
 
 
-    $ajax_handler->add_error(null, "Devi effettuare il login per compiere questa azione!");
+    $ajax_handler->add_error_message(null);
+    $ajax_handler->set_success(false);
     return;
-    
+
   }
-  
+
   /**
-  * Register Settings Section
-  *
-  * Registers the Action controls
-  *
-  * @access public
-  * @param \Elementor\Widget_Base $widget
-  */
-  public function register_settings_section( $widget ) {
+   * Register Settings Section
+   *
+   * Registers the Action controls
+   *
+   * @access public
+   * @param \Elementor\Widget_Base $widget
+   */
+  public function register_settings_section($widget)
+  {
     $widget->start_controls_section(
       'section_' . $this->get_name(),
       [
@@ -81,7 +87,7 @@ class Elementor_Miraiedu_Edit_Child_Data extends \ElementorPro\Modules\Forms\Cla
         ],
       ],
     );
-    
+
     $widget->add_control(
       $this->get_name() . "_url_success",
       [
@@ -91,8 +97,8 @@ class Elementor_Miraiedu_Edit_Child_Data extends \ElementorPro\Modules\Forms\Cla
         'description' => "The url where the customer will be redirect if he is logged in with success",
       ],
     );
-    
-    
+
+
     // $widget->add_control(
     //   $this->get_name() . "_child_gender",
     //   [
@@ -122,7 +128,7 @@ class Elementor_Miraiedu_Edit_Child_Data extends \ElementorPro\Modules\Forms\Cla
     //     'description' => "The form field ID containing the first birthdate field ID (it should end by '__0')",
     //   ],
     // );
-    
+
     // $widget->add_control(
     //   $this->get_name() . "_role",
     //   [
@@ -142,22 +148,23 @@ class Elementor_Miraiedu_Edit_Child_Data extends \ElementorPro\Modules\Forms\Cla
         'description' => "The form field ID containing the JSON of the child data",
       ],
     );
-    
-    
-    
+
+
+
     $widget->end_controls_section();
-    
+
   }
-  
+
   /**
-  * On Export
-  *
-  * Clears form settings on export
-  * @access Public
-  * @param array $element
-  */
-  public function on_export( $element ) {
+   * On Export
+   *
+   * Clears form settings on export
+   * @access Public
+   * @param array $element
+   */
+  public function on_export($element)
+  {
   }
-  
-  
+
+
 }

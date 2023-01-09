@@ -96,7 +96,6 @@ class MiraiflixProfFilters extends Widget_Base
   public function __construct($data = [], $args = null)
   {
     parent::__construct($data, $args);
-
     wp_register_script('miraiedu-prof-filters-js', plugins_url('/assets/js/prof-filters.js', __DIR__), array('jquery'));
     wp_register_style('miraiedu-prof-filters-css', plugins_url('/assets/css/prof-filters.css', __DIR__));
   }
@@ -165,6 +164,22 @@ class MiraiflixProfFilters extends Widget_Base
       'target_link',
       [
         'label' => esc_html__('Link', 'textdomain'),
+        'type' => \Elementor\Controls_Manager::URL,
+        'placeholder' => esc_html__('https://your-link.com', 'textdomain'),
+        'options' => ['url', 'is_external', 'nofollow'],
+        'default' => [
+          'url' => '',
+          'is_external' => false,
+          'nofollow' => true,
+        ],
+        'label_block' => true,
+      ]
+    );
+
+    $this->add_control(
+      'reset_link',
+      [
+        'label' => esc_html__('Reset Link', 'textdomain'),
         'type' => \Elementor\Controls_Manager::URL,
         'placeholder' => esc_html__('https://your-link.com', 'textdomain'),
         'options' => ['url', 'is_external', 'nofollow'],
@@ -354,7 +369,7 @@ class MiraiflixProfFilters extends Widget_Base
     $this->add_typography_control(
       "Content",
       "filter_content_style",
-      ".miraiedu-filters-container .miraiedu-filter-content li",
+      ".miraiedu-filters-container .miraiedu-filter-content li a",
     false
     );
 
@@ -430,7 +445,8 @@ class MiraiflixProfFilters extends Widget_Base
 
 ?>
 <div class="miraiedu-filters-container <?php echo ($settings['show_first_element']); ?>"
-  data-url="<?php echo ($settings["target_link"]["url"]); ?>">
+  data-url="<?php echo ($settings["target_link"]["url"]); ?>"
+  data-reset-url="<?php echo ($settings["reset_link"]["url"]); ?>">
   <?php
 
     // $args = miraiedu_get_widget_query_args('professionisti', $settings);
@@ -482,6 +498,10 @@ class MiraiflixProfFilters extends Widget_Base
             break;
           }
         }
+        // Nome personalizzato filtri età
+        if ($filter_tax == "filtri_eta" && isset($_GET["filtri_eta_nome"])) {
+          $filter_title = "Età di " . $_GET["filtri_eta_nome"];
+        }
       }
 
       $ul_style = "";
@@ -509,7 +529,7 @@ class MiraiflixProfFilters extends Widget_Base
 
       foreach ($terms as $term):
         ?>
-        <li class="<?php echo ($term["active"] ? "active" : "") ?>">
+        <li class="<?php echo ((isset($term["active"]) && $term["active"]) ? "active" : "") ?>">
           <a href="#" data-slug="<?php echo ($term["slug"]); ?>" data-tax="<?php echo ($filter_tax); ?>">
             <?php echo ($term["name"]); ?>
           </a>

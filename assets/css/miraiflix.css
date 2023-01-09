@@ -115,7 +115,7 @@
   transition: opacity 0.3s ease;
 }
 
-@media screen and (min-width: 500px) {
+@media screen and (min-width: 500px) and (hover: hover) {
   .miraiflix-slide-container:hover .miraiflix-slide {
     transform: scale(1.3);
     z-index: 2;
@@ -172,11 +172,12 @@
 .miraiflix-slide-content .miraiflix-slide-footer p {
   line-height: 1.2em;
   padding-right: 10px;
+  display: none;
 }
 
 .miraiflix-slide-content .miraiflix-slide-footer h3 {
   font-size: 12px;
-  margin: 10px 0px 0px 0px;
+  margin: 10px 0px;
 }
 
 .miraiflix-slide-content .miraiflix-slide-footer .miraiflix-slide-footer-icon {
@@ -191,7 +192,14 @@
   flex-grow: 1;
 }
 
-@media screen and (min-width: 500px) {
+.miraiflix-slide-content .miraiflix-slide-footer-content {
+  width: 100%;
+}
+
+@media screen and (min-width: 500px) and (hover: hover) {
+  .miraiflix-slide-content .miraiflix-slide-footer p {
+    display: block;
+  }
   .miraiflix-slide-content {
     opacity: 0;
   }
@@ -199,7 +207,7 @@
 
 /* POST SLIDE */
 
-@media screen and (min-width: 500px) {
+@media screen and (min-width: 500px) and (hover: hover) {
   .miraiedu-video-slider-container.posts
     .miraiflix-slide-container:hover
     .miraiflix-slide {
@@ -282,7 +290,7 @@
   display: block;
   font-size: 1em;
   flex-grow: 1;
-  display: flex;
+  display: none;
   align-items: flex-end;
 }
 .miraiedu-video-slider-container.prof .miraiflix-slide-footer p {
@@ -307,7 +315,7 @@
   flex-grow: 1;
 }
 
-@media screen and (min-width: 500px) {
+@media screen and (min-width: 500px) and (hover: hover) {
   .miraiedu-video-slider-container.prof
     .miraiflix-slide-container:hover
     .miraiflix-slide {
@@ -321,6 +329,7 @@
     overflow: hidden;
     transition: opacity 0.3s ease, max-height 0.3s ease-out;
     position: absolute;
+    display: flex;
   }
   .miraiedu-video-slider-container.prof
     .miraiflix-slide-container:hover
@@ -328,6 +337,36 @@
     position: relative;
     opacity: 1;
     max-height: 100%;
+  }
+
+  .miraiedu-video-slider-container.prof
+    .miraiflix-slide-container
+    .miraiflix-slide-content::after {
+    background: linear-gradient(
+        180deg,
+        #2542b8cc 0%,
+        #2542b866 30%,
+        #2542b8ee 70%,
+        #2542b8ee 100%
+      )
+      0% 0% no-repeat padding-box;
+    display: block;
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s linear;
+    border-radius: 10px;
+  }
+
+  .miraiedu-video-slider-container.prof
+    .miraiflix-slide-container:hover
+    .miraiflix-slide-content::after {
+    opacity: 1;
   }
 }
 
@@ -339,8 +378,8 @@
   justify-content: center;
   flex-wrap: wrap;
   padding: 40px 0px;
-  margin-top: 40px;
-  margin-bottom: 10px;
+  gap: 30px;
+  padding: 50px 5%;
 }
 
 .miraiedu-tappa-eta-img {
@@ -348,20 +387,20 @@
   display: inline-block;
 }
 .miraiedu-tappa-eta-testo {
-  flex: 1 1 200px;
-  min-width: 400px;
-  max-width: 1000px;
-  padding: 0px 30px;
+  flex: 1 0 200px;
 }
 .miraiedu-tappa-eta-testo p {
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
+  box-orient: vertical;
   overflow: hidden;
 }
 
-.miraiedu-tappa-eta-testo:hover p {
+.miraiedu-tappa-eta-testo.open p {
   -webkit-line-clamp: 1000;
+  line-clamp: 1000;
 }
 
 /* GRID WIDGETS */

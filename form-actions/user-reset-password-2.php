@@ -1,6 +1,6 @@
 <?php
 
-class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Action_Base
+class Elementor_Miraiedu_Reset_Psw_2 extends \ElementorPro\Modules\Forms\Classes\Action_Base
 {
   /**
    * Get Name
@@ -12,7 +12,7 @@ class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Actio
    */
   public function get_name()
   {
-    return 'miraiedu_login';
+    return 'miraiedu_reset_password_2';
   }
 
   /**
@@ -25,7 +25,7 @@ class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Actio
    */
   public function get_label()
   {
-    return 'User Login';
+    return 'User Reset Password 2';
   }
 
   /**
@@ -39,26 +39,47 @@ class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Actio
    */
   public function run($record, $ajax_handler)
   {
+
     $settings = $record->get('form_settings');
     $emailField = $settings[$this->get_name() . "_email"];
+    $tmpCodeField = $settings[$this->get_name() . "_tmp_code"];
     $passField = $settings[$this->get_name() . "_password"];
-    $rememberField = $settings[$this->get_name() . "_remember"];
+    $pass2Field = $settings[$this->get_name() . "_password_repeat"];
 
     // Get submitted Form data
     $rawFields = (array) $record->get('fields');
-    $creds = array();
-    $creds['user_login'] = $rawFields[$emailField]["value"];
-    $creds['user_password'] = $rawFields[$passField]["value"];
-    $creds['remember'] = ($rawFields[$rememberField]["value"] !== "");
+    $user_login = $rawFields[$emailField]["value"];
+    $user_tmp_code = $rawFields[$tmpCodeField]["value"];
+    $user_pass = $rawFields[$passField]["value"];
+    if ($pass2Field && $user_pass != $rawFields[$pass2Field]["value"]) {
+      // Repeated password wrongly
+      $ajax_handler->add_error($pass2Field, "Le password non corrispondono");
+      return;
+    }
 
-    $login_user = wp_signon($creds, is_ssl());
+    $user = get_user_by('login', $user_login);
 
-    if (!is_wp_error($login_user)) {
+
+    if (!is_wp_error($user) && $user && !$user->is_admin()) {
+
+      if (get_user_meta($user->ID, 'miraiedu_temp_code', true) != $user_tmp_code) {
+        // Wrong temporary code!
+        $ajax_handler->add_error($tmpCodeField, "Questo codice temporaneo non risulta");
+        return;
+      }
+
+      wp_set_password($user_pass, $user->ID);
+      delete_user_meta($user->ID, 'miraiedu_temp_code');
+
       $redirect_to = $settings[$this->get_name() . "_url_success"];
       $redirect_to = $record->replace_setting_shortcodes($redirect_to, true);
       if (!empty($redirect_to)) {
         $ajax_handler->add_response_data('redirect_url', $redirect_to);
       }
+
+      wp_set_current_user($user->ID);
+      wp_set_auth_cookie($user->ID, true);
+
       return;
     }
 
@@ -109,22 +130,32 @@ class Elementor_Miraiedu_Login extends \ElementorPro\Modules\Forms\Classes\Actio
     );
 
     $widget->add_control(
-      $this->get_name() . "_password",
+      $this->get_name() . "_tmp_code",
       [
-        'label' => "FIELD: Password",
+        'label' => "FIELD: Temporary Code",
         'type' => \Elementor\Controls_Manager::TEXT,
-        'separator' => 'none',
-        'description' => "The form field ID containing the password of customer",
+        'separator' => 'before',
+        'description' => "The form field ID containing the temporary password code sent by email",
       ],
     );
 
     $widget->add_control(
-      $this->get_name() . "_remember",
+      $this->get_name() . "_password",
       [
-        'label' => "FIELD: Remember",
+        'label' => "FIELD: Password",
         'type' => \Elementor\Controls_Manager::TEXT,
-        'separator' => 'none',
-        'description' => "The form field ID containing the remember-me checkbox",
+        'separator' => 'before',
+        'description' => "The form field ID containing the newly chosen password",
+      ],
+    );
+
+    $widget->add_control(
+      $this->get_name() . "_password_repeat",
+      [
+        'label' => "FIELD: Repeat Password",
+        'type' => \Elementor\Controls_Manager::TEXT,
+        'separator' => 'before',
+        'description' => "The form field ID of the repeated password. Leave this blank for no check",
       ],
     );
 
